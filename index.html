@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e4a3e">
+<meta name="description" content="Sabah Labour Ordinance 2025 - Salary & Overtime Calculator">
+<title>Sabah OT Calculator</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(180deg, #f7f5f0 0%, #ede8df 100%);
+    min-height: 100vh;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+  }
+  input, select { font-family: 'DM Sans', sans-serif; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0e4a3e 0%, #1a6b55 50%, #257a60 100%);
+    padding: 36px 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .header::after {
+    content: '';
+    position: absolute; bottom: -20px; left: -20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .header-inner { position: relative; max-width: 600px; margin: 0 auto; }
+  .header-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #8bc9a7; margin-bottom: 8px; }
+  .header h1 { font-size: 28px; font-family: 'Playfair Display', serif; font-weight: 800; color: #fff; line-height: 1.2; }
+  .header-sub { font-size: 12px; color: #a3d4b8; margin-top: 10px; line-height: 1.5; }
+
+  /* Container */
+  .container { max-width: 600px; margin: 0 auto; padding: 24px 16px 40px; }
+
+  /* Info Cards Row */
+  .info-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .info-card {
+    background: #f7f5f0; border-radius: 14px; padding: 18px 20px;
+    flex: 1; min-width: 100px;
+  }
+  .info-card.accent {
+    background: linear-gradient(135deg, #0e4a3e 0%, #1a6b55 100%);
+    color: #e8f5e9;
+  }
+  .info-card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.7; margin-bottom: 4px; }
+  .info-card-value { font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; }
+  .info-card-sub { font-size: 11px; margin-top: 4px; opacity: 0.6; }
+
+  /* Card */
+  .card {
+    background: #fff; border-radius: 16px; padding: 24px;
+    margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; font-family: 'Playfair Display', serif; }
+
+  /* Input */
+  .field { margin-bottom: 16px; }
+  .field-label {
+    display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;
+    color: #4a4a4a; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .field-wrap { display: flex; align-items: center; gap: 8px; }
+  .field input, .field select {
+    width: 100%; padding: 10px 14px;
+    border: 2px solid #d4cfc4; border-radius: 10px;
+    font-size: 16px; font-weight: 600; color: #1a1a1a;
+    background: #fff; outline: none; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { border-color: #1a6b55; }
+  .field-suffix { font-size: 13px; color: #888; font-weight: 600; white-space: nowrap; }
+  .field-note { font-size: 11px; color: #999; margin-top: 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Info bar */
+  .info-bar {
+    background: #f0faf4; border-radius: 10px; padding: 10px 14px;
+    margin-bottom: 8px; font-size: 12px; color: #2d6a4f; line-height: 1.5;
+  }
+
+  /* Rate badges */
+  .rate-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .rate-badge { border-radius: 10px; padding: 14px 12px; text-align: center; }
+  .rate-badge-value { font-size: 24px; font-weight: 800; font-family: 'Playfair Display', serif; }
+  .rate-badge-label { font-size: 11px; font-weight: 600; margin-top: 4px; opacity: 0.8; }
+  .rate-badge-sub { font-size: 10px; color: #999; margin-top: 4px; }
+
+  /* Breakdown rows */
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid #eae6de;
+  }
+  .row-label { font-size: 14px; font-weight: 600; }
+  .row-sub { font-size: 11px; color: #999; margin-top: 2px; }
+  .row-amount { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; }
+  .color-green { color: #1a6b55; }
+  .color-orange { color: #c77a00; }
+  .color-red { color: #b33636; }
+  .color-dark { color: #2d2d2d; }
+
+  .ot-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 16px; margin-top: 4px;
+  }
+  .ot-total-label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+  .ot-total-value { font-size: 20px; font-weight: 700; color: #1a6b55; font-family: 'Playfair Display', serif; }
+
+  /* Big total */
+  .total-card {
+    background: linear-gradient(135deg, #0e4a3e 0%, #1a6b55 50%, #257a60 100%);
+    border-radius: 18px; padding: 28px 24px; text-align: center;
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(14, 74, 62, 0.3);
+  }
+  .total-card::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .total-card-inner { position: relative; }
+  .total-tag { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #8bc9a7; margin-bottom: 8px; }
+  .total-value { font-size: 40px; font-weight: 800; color: #fff; font-family: 'Playfair Display', serif; letter-spacing: -1px; }
+  .total-sub { font-size: 12px; color: #a3d4b8; margin-top: 8px; }
+
+  /* Formula */
+  .formula { font-size: 12px; color: #666; line-height: 2; font-family: 'DM Sans', monospace; }
+
+  /* Disclaimer */
+  .disclaimer {
+    margin-top: 16px; padding: 14px 16px; background: #fef9ee;
+    border-radius: 12px; border: 1px solid #f0e4c8;
+    font-size: 11px; color: #8a6f3e; line-height: 1.6;
+  }
+
+  /* Offline banner */
+  .offline-banner {
+    display: none; text-align: center; padding: 6px;
+    background: #ffeeba; color: #856404; font-size: 11px;
+  }
+  .offline-banner.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offlineBanner">📡 You're offline — app still works!</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">Sabah Labour Ordinance 2025</div>
+    <h1>Salary & Overtime<br>Calculator</h1>
+    <div class="header-sub">Based on 45-hour work week • Effective 1 May 2025</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Info Cards -->
+  <div class="info-row">
+    <div class="info-card"><div class="info-card-label">ORP (Daily)</div><div class="info-card-value" id="orpDisplay">RM 0.00</div><div class="info-card-sub">Salary ÷ 26</div></div>
+    <div class="info-card"><div class="info-card-label">HRP (Hourly)</div><div class="info-card-value" id="hrpDisplay">RM 0.00</div><div class="info-card-sub" id="hrpSub">ORP ÷ 0h</div></div>
+    <div class="info-card"><div class="info-card-label">Daily OT</div><div class="info-card-value" id="dailyOTDisplay">0h</div><div class="info-card-sub" id="dailyOTSub">Until —</div></div>
+  </div>
+
+  <!-- Employment Details -->
+  <div class="card">
+    <div class="card-title">💼 Your Employment Details</div>
+
+    <div class="field">
+      <label class="field-label">Basic Monthly Salary</label>
+      <div class="field-wrap">
+        <input type="number" id="basicSalary" value="1700" min="0" step="100">
+        <span class="field-suffix">RM / month</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label class="field-label">Work Days / Week</label>
+        <select id="workDays">
+          <option value="5">5 days</option>
+          <option value="6" selected>6 days</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Lunch Break</label>
+        <div class="field-wrap">
+          <input type="number" id="lunchBreak" value="1" min="0" max="2" step="0.5">
+          <span class="field-suffix">hours</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label class="field-label">Work Starts</label>
+        <select id="normalStart"></select>
+      </div>
+      <div class="field">
+        <label class="field-label">Work Ends</label>
+        <select id="normalEnd"></select>
+      </div>
+    </div>
+
+    <div class="info-bar" id="normalHoursInfo">📋 Normal hours/day: <strong>8h</strong> → Weekly: <strong>45h</strong> (max 45h)</div>
+  </div>
+
+  <!-- Overtime Settings -->
+  <div class="card">
+    <div class="card-title">⏰ Overtime Settings</div>
+
+    <div class="field">
+      <label class="field-label">OT Until (End Time)</label>
+      <select id="otEnd"></select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Rest Day OT (per week)</label>
+      <div class="field-wrap">
+        <input type="number" id="restDayOT" value="0" min="0" max="12" step="0.5">
+        <span class="field-suffix">hours</span>
+      </div>
+      <div class="field-note">Work done beyond normal hours on rest day</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Public Holiday OT (per month)</label>
+      <div class="field-wrap">
+        <input type="number" id="phOT" value="0" min="0" max="48" step="0.5">
+        <span class="field-suffix">hours</span>
+      </div>
+      <div class="field-note">Work done beyond normal hours on PH</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Working Weeks / Month</label>
+      <div class="field-wrap">
+        <input type="number" id="workingWeeks" value="4" min="1" max="5" step="1">
+        <span class="field-suffix">weeks</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rate Reference -->
+  <div class="card">
+    <div class="card-title">📊 OT Rate Reference</div>
+    <div class="rate-grid">
+      <div class="rate-badge" style="background:#edf7f1"><div class="rate-badge-value" style="color:#1a6b55">1.5×</div><div class="rate-badge-label" style="color:#1a6b55">Normal Day</div><div class="rate-badge-sub">× HRP</div></div>
+      <div class="rate-badge" style="background:#fef5e7"><div class="rate-badge-value" style="color:#c77a00">2.0×</div><div class="rate-badge-label" style="color:#c77a00">Rest Day</div><div class="rate-badge-sub">× HRP</div></div>
+      <div class="rate-badge" style="background:#fdeaea"><div class="rate-badge-value" style="color:#b33636">3.0×</div><div class="rate-badge-label" style="color:#b33636">Public Holiday</div><div class="rate-badge-sub">× HRP</div></div>
+    </div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="card">
+    <div class="card-title">💰 Monthly Breakdown</div>
+    <div id="breakdownRows"></div>
+    <div class="ot-total">
+      <div class="ot-total-label">Total OT Pay</div>
+      <div class="ot-total-value" id="totalOT">+ RM 0.00</div>
+    </div>
+  </div>
+
+  <!-- Total Card -->
+  <div class="total-card">
+    <div class="total-card-inner">
+      <div class="total-tag">Estimated Monthly Take-Home</div>
+      <div class="total-value" id="totalMonthly">RM 0.00</div>
+      <div class="total-sub" id="totalSub">Basic RM 0 + OT RM 0</div>
+    </div>
+  </div>
+
+  <!-- Formula -->
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">📐 Formula Used</div>
+    <div class="formula">
+      <div><strong>ORP</strong> = Basic Salary ÷ 26 days</div>
+      <div><strong>HRP</strong> = ORP ÷ Normal Hours/Day</div>
+      <div><strong>Normal OT</strong> = Hours × HRP × 1.5</div>
+      <div><strong>Rest Day OT</strong> = Hours × HRP × 2.0</div>
+      <div><strong>PH OT</strong> = Hours × HRP × 3.0</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Disclaimer:</strong> This calculator provides estimates based on the Sabah Labour Ordinance (Cap. 67) as amended May 2025. Actual pay may vary based on your employment contract. OT max is 104 hours/month. Does not include EPF, SOCSO, EIS deductions. Consult JTK Sabah for official guidance.
+  </div>
+
+</div>
+
+<script>
+// Helper
+function formatRM(v) { return 'RM ' + v.toFixed(2); }
+function formatTime(h) { return (h > 12 ? h - 12 : h) + ':00 ' + (h >= 12 ? 'PM' : 'AM'); }
+
+// Populate hour selects
+function populateHours(sel, min, max, defaultVal) {
+  sel.innerHTML = '';
+  for (let i = min; i <= max; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = formatTime(i);
+    if (i === defaultVal) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+const els = {
+  basicSalary: document.getElementById('basicSalary'),
+  workDays: document.getElementById('workDays'),
+  lunchBreak: document.getElementById('lunchBreak'),
+  normalStart: document.getElementById('normalStart'),
+  normalEnd: document.getElementById('normalEnd'),
+  otEnd: document.getElementById('otEnd'),
+  restDayOT: document.getElementById('restDayOT'),
+  phOT: document.getElementById('phOT'),
+  workingWeeks: document.getElementById('workingWeeks'),
+};
+
+populateHours(els.normalStart, 6, 22, 8);
+populateHours(els.normalEnd, 6, 22, 17);
+populateHours(els.otEnd, 6, 22, 20);
+
+function updateOTEndOptions() {
+  const endH = parseInt(els.normalEnd.value);
+  const current = parseInt(els.otEnd.value);
+  els.otEnd.innerHTML = '';
+  for (let i = endH + 1; i <= 22; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = formatTime(i);
+    if (i === current || (current <= endH && i === endH + 1)) opt.selected = true;
+    els.otEnd.appendChild(opt);
+  }
+}
+
+function calculate() {
+  const salary = parseFloat(els.basicSalary.value) || 0;
+  const days = parseInt(els.workDays.value);
+  const lunch = parseFloat(els.lunchBreak.value) || 0;
+  const startH = parseInt(els.normalStart.value);
+  const endH = parseInt(els.normalEnd.value);
+  const otEndH = parseInt(els.otEnd.value);
+  const restOT = parseFloat(els.restDayOT.value) || 0;
+  const phOT = parseFloat(els.phOT.value) || 0;
+  const weeks = parseInt(els.workingWeeks.value) || 4;
+
+  const normalPerDay = endH - startH - lunch;
+  const weeklyNormal = Math.min(normalPerDay * days, 45);
+  const actualDaily = weeklyNormal / days;
+
+  const orp = salary / 26;
+  const hrp = actualDaily > 0 ? orp / actualDaily : 0;
+  const dailyOT = Math.max(0, otEndH - endH);
+  const weeklyNormalDayOT = dailyOT * days;
+
+  const monthNormalOTH = weeklyNormalDayOT * weeks;
+  const monthRestOTH = restOT * weeks;
+  const monthPHOTH = phOT;
+
+  const normalOTPay = monthNormalOTH * hrp * 1.5;
+  const restOTPay = monthRestOTH * hrp * 2.0;
+  const phOTPay = monthPHOTH * hrp * 3.0;
+  const totalOT = normalOTPay + restOTPay + phOTPay;
+  const totalMonthly = salary + totalOT;
+
+  // Update displays
+  document.getElementById('orpDisplay').textContent = formatRM(orp);
+  document.getElementById('hrpDisplay').textContent = formatRM(hrp);
+  document.getElementById('hrpSub').textContent = 'ORP ÷ ' + actualDaily.toFixed(1) + 'h';
+  document.getElementById('dailyOTDisplay').textContent = dailyOT + 'h';
+  document.getElementById('dailyOTSub').textContent = 'Until ' + formatTime(otEndH);
+  document.getElementById('normalHoursInfo').innerHTML = '📋 Normal hours/day: <strong>' + normalPerDay + 'h</strong> → Weekly: <strong>' + weeklyNormal + 'h</strong> (max 45h)';
+
+  // Breakdown
+  let rows = `<div class="row"><div><div class="row-label">Basic Salary</div><div class="row-sub">Monthly base</div></div><div class="row-amount color-dark">${formatRM(salary)}</div></div>`;
+
+  if (monthNormalOTH > 0) {
+    rows += `<div class="row"><div><div class="row-label">Normal Day OT (1.5×)</div><div class="row-sub">${monthNormalOTH} hrs × ${formatRM(hrp)} × 1.5</div></div><div class="row-amount color-green">${formatRM(normalOTPay)}</div></div>`;
+  }
+  if (monthRestOTH > 0) {
+    rows += `<div class="row"><div><div class="row-label">Rest Day OT (2.0×)</div><div class="row-sub">${monthRestOTH} hrs × ${formatRM(hrp)} × 2.0</div></div><div class="row-amount color-orange">${formatRM(restOTPay)}</div></div>`;
+  }
+  if (monthPHOTH > 0) {
+    rows += `<div class="row"><div><div class="row-label">Public Holiday OT (3.0×)</div><div class="row-sub">${monthPHOTH} hrs × ${formatRM(hrp)} × 3.0</div></div><div class="row-amount color-red">${formatRM(phOTPay)}</div></div>`;
+  }
+
+  document.getElementById('breakdownRows').innerHTML = rows;
+  document.getElementById('totalOT').textContent = '+ ' + formatRM(totalOT);
+  document.getElementById('totalMonthly').textContent = formatRM(totalMonthly);
+  document.getElementById('totalSub').textContent = 'Basic ' + formatRM(salary) + ' + OT ' + formatRM(totalOT);
+}
+
+// Event listeners
+Object.values(els).forEach(el => el.addEventListener('input', calculate));
+Object.values(els).forEach(el => el.addEventListener('change', () => {
+  if (el === els.normalEnd) updateOTEndOptions();
+  calculate();
+}));
+
+updateOTEndOptions();
+calculate();
+
+// Offline detection
+window.addEventListener('online', () => document.getElementById('offlineBanner').classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offlineBanner').classList.add('show'));
+</script>
+</body>
+</html>
